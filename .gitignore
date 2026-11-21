@@ -1,0 +1,28 @@
+# Ignore dataset contents, but preserve folder
+data/*
+!data/.gitkeep
+
+# Ignore results contents, but preserve folder
+results/*
+!results/.gitkeep
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log

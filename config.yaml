@@ -1,0 +1,117 @@
+# Configuration for train.py and evaluate.py.
+#
+# The scripts in src/ take their settings from EEG_* environment variables. train.py and
+# evaluate.py read this file and set those variables, so this file is the single place to
+# change a run. The "protocol" section at the end documents the constants that are fixed
+# in the code. Editing it does NOT change a run.
+
+# Folder with the .set files (Cao et al. 2019, figshare 10.6084/m9.figshare.6427334.v2).
+# Relative paths are resolved from the project root. results/ and figures/ are written
+# next to this folder, so keep it at the project root.
+data_dir: 6427334
+
+# cuda, mps, cpu, or auto (cuda > mps > cpu). JP ran on an RTX 3080 (cuda); Alberto on mps.
+device: auto
+
+# true: one fold and 3 epochs, outputs suffixed with _quick (smoke test only).
+quick: false
+
+# Data preparation, run in this order by `python train.py prepare`.
+prepare:
+  - inventario_sesiones   # session inventory: RT distribution, duration, overlaps
+  - crear_ventanas        # 3 s pre-event windows, Fz/Pz/Oz, 1-50 Hz, 250 Hz, labels
+  - folds_y_baselines     # artifact mask, 5 subject folds (folds.csv), classical baselines
+  - crear_imagenes        # CWT and STFT images 3x128x128
+
+# Training experiments, run with `python train.py <name>` (or `all`).
+# Allowed keys: script, lr, seeds, repr (cwt|stft), pretrained, channels, band, tag,
+# compare, fold, seed, force. Each key maps to one EEG_* variable (see train.py).
+experiments:
+  # Main comparison
+  eegnet:                       # baseline: EEGNet v4 on the raw signal
+    script: entrenar_eegnet
+  resnet18_cwt:                 # main model: ImageNet ResNet18 on CWT scalograms
+    script: entrenar_cnn
+    repr: cwt
+
+  # Learning-rate check, symmetric for both models, seed 0 only
+  eegnet_lr0.0003: {script: entrenar_eegnet, lr: 0.0003, seeds: [0]}
+  eegnet_lr0.003:  {script: entrenar_eegnet, lr: 0.003,  seeds: [0]}
+  resnet18_cwt_lr1e-05: {script: entrenar_cnn, repr: cwt, lr: 1.0e-5, seeds: [0]}
+  resnet18_cwt_lr3e-05: {script: entrenar_cnn, repr: cwt, lr: 3.0e-5, seeds: [0]}
+
+  # Ablations
+  resnet18_stft:                # representation: STFT instead of CWT (pending)
+    script: entrenar_cnn
+    repr: stft
+  resnet18_cwt_scratch:         # pretraining: same network without ImageNet weights
+    script: entrenar_cnn
+    repr: cwt
+    pretrained: false
+
+  # Replication of the main model on another machine (Apple MPS, float32)
+  resnet18_cwt_mps:
+    script: entrenar_cnn
+    repr: cwt
+    device: mps
+    tag: mps
+
+  # Diagnostics
+  diagnostico_eegnet:           # EEGNet by channel and by band (7 variants + table/figure)
+    script: diagnostico_eegnet
+  saliencia_cnn:                # Grad-CAM on one ResNet18 (fold 0, seed 0)
+    script: saliencia_cnn
+    fold: 0
+    seed: 0
+
+# Experiments run by `python train.py all`. resnet18_stft is not in the list because
+# it is still pending.
+all:
+  - eegnet
+  - resnet18_cwt
+  - eegnet_lr0.0003
+  - eegnet_lr0.003
+  - resnet18_cwt_lr1e-05
+  - resnet18_cwt_lr3e-05
+  - resnet18_cwt_scratch
+  - diagnostico_eegnet
+  - saliencia_cnn
+
+# Settings for evaluate.py
+evaluate:
+  n_permutations: 2000
+  # Main comparison (A minus B) used for the per-subject failure analysis. The files in
+  # results/ were made with the MPS replication. Which ResNet18 run (JP's cuda
+  # resnet18_cwt or Alberto's resnet18_cwt_mps) is the primary one is still to be decided.
+  pair: [resnet18_cwt_mps, eegnet]
+  # Models in the permutation test and the all-pairs bootstrap. null = every
+  # *_scores.npz that is not an lr variant, which also includes the EEGNet diagnostics.
+  models: [eegnet, resnet18_cwt_mps, resnet18_cwt_scratch, resnet18_cwt]
+
+# --------------------------------------------------------------------------------------
+# Protocol. These values are fixed in src/. They are listed here for the report only.
+# --------------------------------------------------------------------------------------
+protocol:
+  dataset: "Cao et al. 2019, Scientific Data 6:19, figshare v2, CC BY 4.0"
+  excluded_sessions: [s04_051130m]          # duplicate of s05_051120m
+  channels: [Fz, Pz, Oz]
+  window_s: 3.0                              # ends at deviation onset (markers 251/252)
+  bandpass_hz: [1, 50]                       # zero-phase Butterworth, order 4
+  sampling_hz: 250                           # decimated from 500
+  label: "RT < 1.5 x p5(session) fast, RT > 2.5 x p5(session) slow, rest discarded"
+  rt_limits_s: [0.1, 60]
+  max_abs_uv: 150
+  folds: 5                                   # by subject, saved in results/folds.csv
+  seeds: [0, 1, 2]
+  min_windows_per_class_for_subject_metric: 30
+  bootstrap_resamples: 2000
+  images: {size: 128, fmin_hz: 1, fmax_hz: 40, cwt_cycles: 6}
+  eegnet: {F1: 8, D: 2, F2: 16, kernel_t: 125, kernel_sep: 32, dropout: 0.5,
+           optimizer: AdamW, lr: 1.0e-3, weight_decay: 0.01, batch: 128,
+           max_epochs: 40, patience: 8}
+  resnet18: {weights: ImageNet, finetune: all layers, optimizer: AdamW, lr: 1.0e-4,
+             weight_decay: 0.01, batch: 64, max_epochs: 80, patience: 8,
+             amp: "cuda only (float32 on mps)"}
+  early_stopping: "4 training subjects held out as internal validation"
+  loss: "class-weighted binary cross-entropy"
+  primary_metric: "balanced accuracy on unseen subjects"
