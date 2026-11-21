@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Decoding a subject-relative state from pre-event EEG: time-frequency images vs. raw signal
 
 Course final project by Juan Pablo and Alberto. From the 3 s of EEG (Fz, Pz, Oz) before a car drifts out of its lane, we predict whether the driver's response will be **fast or slow**, always testing on **unseen subjects**. The main question is whether a ResNet18 pretrained on ImageNet, applied to wavelet scalograms, generalizes better than EEGNet on the raw signal.
@@ -118,3 +119,6 @@ The dataset (`6427334/`, about 18 GB, plus its zip) is not versioned; download i
 - `results/*.pt` checkpoints (43 MB, only the Grad-CAM model is kept)
 
 Everything else in `results/` (CSV, `*_scores.npz` test probabilities, logs) is small, and `evaluate.py` needs it, so it is kept.
+=======
+# Team 8 - Deep Learning
+>>>>>>> origin/main
