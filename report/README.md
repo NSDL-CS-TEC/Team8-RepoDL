@@ -6,7 +6,7 @@
 | `02_presentacion/slides.pdf` | 10-minute presentation (Beamer, 16:9). Source: `slides.tex`. |
 | `03_resumen/resumen.pdf` | One-page summary. Source: `resumen.tex`. |
 | `contexto_tesis_Alberto.md` | Alberto's thesis context and next step (Spanish and English). |
-| `Final project protocol ... .docx` | Protocol and status document. Its numbers predate the final runs; the PDFs above are the reference. |
+| `archive/protocol_2026-11-16.docx` | Protocol and status document as of 16 Nov 2026, kept as history. Its numbers predate the final runs; the PDFs above are the reference. |
 
 No number in the documents is typed by hand. They come from `results/` through `01_reporte/numeros.tex` and the `tabla_*.tex` tables, which `generar_numeros.py` writes. The slides and summary reuse the report's macros and figures (`../01_reporte/`).
 

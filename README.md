@@ -12,7 +12,7 @@ Course final project by Juan Pablo Acevedo Robles and Alberto Martinez Hernandez
 
 **Main runs.** The ResNet18 is `resnet18_cwt_mps` and EEGNet is `eegnet_lr0.003_final`. Both ran on the same hardware and precision (Apple MPS, float32), as did every ablation, so each paired comparison changes one factor only. JP's CUDA run (`resnet18_cwt`) and the initial EEGNet (`eegnet`, lr 1e-3, 40 epochs) are reported as replications and lead to the same conclusion.
 
-The report, slides and one-page summary (PDF and LaTeX source) are in `report/` (see `report/README.md`). The original protocol document (16 Nov) is also there, but its numbers predate the final runs.
+The report, slides and one-page summary (PDF and LaTeX source) are in `report/` (see `report/README.md`). The original protocol document (16 Nov) is archived in `report/archive/`; its numbers predate the final runs.
 
 ## Repository layout
 
