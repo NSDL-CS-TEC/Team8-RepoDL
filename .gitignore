@@ -2,9 +2,11 @@
 data/*
 !data/.gitkeep
 
-# Ignore results contents, but preserve folder
-results/*
-!results/.gitkeep
+# Large regenerable artifacts in results/ (train.py prepare rebuilds them). Everything
+# else in results/ (CSV, *_scores.npz, logs/) is small and needed by evaluate.py.
+results/ventanas.npz
+results/imagenes_*.npy
+results/*.pt
 
 # macOS
 .DS_Store
@@ -24,5 +26,17 @@ env/
 .vscode/
 .idea/
 
-# Logs
+# Logs (training logs in results/logs/ are kept)
 *.log
+!results/logs/*.log
+
+# LaTeX build files
+report/**/*.aux
+report/**/*.log
+report/**/*.fls
+report/**/*.fdb_latexmk
+report/**/*.out
+report/**/*.blg
+report/**/*.nav
+report/**/*.snm
+report/**/*.toc

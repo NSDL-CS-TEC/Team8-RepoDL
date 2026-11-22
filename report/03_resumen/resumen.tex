@@ -1,0 +1,29 @@
+\documentclass[10pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{../01_reporte/figures/}}
+\input{../01_reporte/numeros}
+\pagestyle{empty}
+
+\begin{document}
+{\Large\bfseries Images or raw signal? Decoding a subject-relative response state from pre-event EEG}\\[2pt]
+Juan Pablo Acevedo Robles and Alberto Martinez Hernandez -- Team 8, Deep Learning final project -- one-page summary
+
+\textbf{Thesis sub-objective.} Both authors infer subjective states from EEG that varies strongly between people: pain intensity (Alberto, quantification and standardization of pain) and trust in autonomous driving (Juan Pablo). The shared sub-objective is to determine which EEG representation generalizes best to \emph{unseen subjects} when the target is defined relative to each person. Because our own datasets are still being collected, a public sustained-attention driving dataset (Cao et al.\ 2019; 26 subjects, 18{,}087 windows) is the testbed. From 3\,s of Fz/Pz/Oz EEG before a lane deviation, we predict whether the response will be fast or slow relative to the subject's own session.
+
+\textbf{Primary hypothesis.} A ResNet18 pretrained on ImageNet and fine-tuned on wavelet scalograms reaches higher balanced accuracy on unseen subjects than EEGNet on the raw signal, under the same data, folds, seeds, loss, early stopping, epoch cap and learning-rate search. Decision rule: mean per-subject $\Delta$ (ResNet18 $-$ EEGNet) $>0$ and its 95\% subject-bootstrap CI excludes 0.
+
+\textbf{Principal result.} Not supported. With 5-fold subject-wise cross-validation $\times$ 3 seeds, EEGNet reaches \eegMainSubj{} per-subject balanced accuracy and ResNet18 \resMainSubj{}: $\Delta=\deltaMain$, 95\% CI \ciMain. Both networks clearly beat a band-power logistic regression (0.681), a time-on-task control (0.567) and permutation chance ($\approx$0.52, $p<0.001$). Ablations: ImageNet pretraining helps the CNN ($\deltaScratch$, CI \ciScratch); the wavelet vs.\ STFT choice \stftShort{} ($\deltaStft$, CI \ciStft).
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{fig_resultados}
+\end{center}
+
+\textbf{Key limitation.} A channel/band diagnostic shows that much of the information is low-frequency (delta) activity at Fz, which may be ocular rather than cortical. Labels are behavioral (reaction time), not an independent measure of drowsiness, and per-session normalization uses unlabeled data from the test session.
+
+\textbf{Planned next step.} Alberto: apply the same protocol to his pain dataset once it reaches 40 subjects, predicting subject-relative pain intensity, starting from raw-signal EEGNet and adding ICA/EOG control for ocular and muscle artifacts. Juan Pablo: apply the pipeline to his CARLA trust dataset.
+\end{document}

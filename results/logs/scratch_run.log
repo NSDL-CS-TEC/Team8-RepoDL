@@ -1,0 +1,29 @@
+Modelo: resnet18_cwt_scratch   dispositivo: mps   imagenes: (18087, 3, 128, 128)   preentrenado: False   lr: 0.0001   semillas: (0, 1, 2)   modo rapido: False
+
+semilla 0 fold 0: bal_acc 0.823  auroc 0.902  (mejor epoca 1, auroc val 0.823, 22.9 s/epoca)  [3.5 min]
+semilla 0 fold 1: bal_acc 0.680  auroc 0.760  (mejor epoca 1, auroc val 0.833, 23.2 s/epoca)  [7.0 min]
+semilla 0 fold 2: bal_acc 0.722  auroc 0.814  (mejor epoca 4, auroc val 0.816, 25.0 s/epoca)  [12.0 min]
+semilla 0 fold 3: bal_acc 0.729  auroc 0.834  (mejor epoca 1, auroc val 0.903, 23.9 s/epoca)  [15.6 min]
+semilla 0 fold 4: bal_acc 0.722  auroc 0.809  (mejor epoca 1, auroc val 0.866, 25.3 s/epoca)  [19.5 min]
+semilla 1 fold 0: bal_acc 0.821  auroc 0.883  (mejor epoca 1, auroc val 0.815, 24.9 s/epoca)  [23.2 min]
+semilla 1 fold 1: bal_acc 0.713  auroc 0.795  (mejor epoca 1, auroc val 0.845, 23.2 s/epoca)  [26.7 min]
+semilla 1 fold 2: bal_acc 0.711  auroc 0.827  (mejor epoca 1, auroc val 0.795, 23.9 s/epoca)  [30.3 min]
+semilla 1 fold 3: bal_acc 0.728  auroc 0.792  (mejor epoca 2, auroc val 0.850, 26.8 s/epoca)  [34.9 min]
+semilla 1 fold 4: bal_acc 0.759  auroc 0.836  (mejor epoca 1, auroc val 0.821, 24.5 s/epoca)  [38.6 min]
+semilla 2 fold 0: bal_acc 0.827  auroc 0.904  (mejor epoca 1, auroc val 0.829, 23.4 s/epoca)  [42.1 min]
+semilla 2 fold 1: bal_acc 0.763  auroc 0.832  (mejor epoca 1, auroc val 0.869, 24.8 s/epoca)  [45.9 min]
+semilla 2 fold 2: bal_acc 0.731  auroc 0.802  (mejor epoca 1, auroc val 0.862, 26.2 s/epoca)  [49.8 min]
+semilla 2 fold 3: bal_acc 0.748  auroc 0.821  (mejor epoca 3, auroc val 0.874, 23.1 s/epoca)  [54.1 min]
+semilla 2 fold 4: bal_acc 0.646  auroc 0.759  (mejor epoca 1, auroc val 0.780, 24.5 s/epoca)  [57.8 min]
+
+===== RESUMEN resnet18_cwt_scratch (lr 0.0001, semillas (0, 1, 2), validacion por sujeto) =====
+bal_acc: 0.742 +- 0.051   auroc: 0.825
+por sujeto: media 0.735  IC95 [0.714, 0.757]   sujetos sobre 0.5: 24/24
+epoca mejor (mediana): 1   tiempo total: 57.8 min
+criterio para elegir la tasa de aprendizaje, AUROC de validacion interna (semilla 0, media de folds): 0.8483
+
+===== resnet18_cwt_scratch contra eegnet =====
+diferencia de balanced accuracy por fold x semilla: media -0.037   resnet18_cwt_scratch mejor en 0/1
+diferencia por sujeto (n = 24): media -0.036   IC95 bootstrap [-0.051, -0.020]   el IC excluye 0: True
+
+Guardado en: /Users/alberto/Documents/Proyecto/results

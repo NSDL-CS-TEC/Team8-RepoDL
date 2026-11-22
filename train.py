@@ -41,6 +41,7 @@ _ENV_KEYS = {
     "seed": ("EEG_SEMILLA", lambda v: str(int(v))),
     "force": ("EEG_FORZAR", lambda v: "1" if v else "0"),
     "device": ("EEG_DEVICE", str),
+    "epochs": ("EEG_EPOCAS", lambda v: str(int(v))),
 }
 
 

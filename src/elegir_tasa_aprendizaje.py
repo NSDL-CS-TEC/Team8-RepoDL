@@ -24,7 +24,7 @@ DATA_DIR = Path(os.environ.get(
 OUT_DIR = DATA_DIR.parent / "results"
 
 DEFAULT_LR = {"eegnet": 1e-3, "resnet18_cwt": 1e-4, "resnet18_stft": 1e-4}
-NAME_RE = re.compile(r"^(eegnet|resnet18_cwt|resnet18_stft)(?:_lr(.+))?$")
+NAME_RE = re.compile(r"^(eegnet|resnet18_cwt|resnet18_stft)(?:_lr([0-9.eE+-]+))?$")   # only the lr-check runs; tagged runs (_final, _mps) are skipped
 
 
 def main():
