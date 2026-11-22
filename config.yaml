@@ -8,7 +8,7 @@
 # Folder with the .set files (Cao et al. 2019, figshare 10.6084/m9.figshare.6427334.v2).
 # Relative paths are resolved from the project root. results/ and figures/ are written
 # next to this folder, so keep it at the project root.
-data_dir: 6427334
+data_dir: data
 
 # cuda, mps, cpu, or auto (cuda > mps > cpu). JP ran on an RTX 3080 (cuda); Alberto on mps.
 device: auto
@@ -40,10 +40,24 @@ experiments:
   resnet18_cwt_lr1e-05: {script: entrenar_cnn, repr: cwt, lr: 1.0e-5, seeds: [0]}
   resnet18_cwt_lr3e-05: {script: entrenar_cnn, repr: cwt, lr: 3.0e-5, seeds: [0]}
 
+  # Final EEGNet run of the protocol: the lr chosen on validation (3e-3, see
+  # `python evaluate.py lr`) and the same 80-epoch cap as ResNet18. Output: eegnet_lr0.003_final
+  eegnet_final:
+    script: entrenar_eegnet
+    lr: 0.003
+    epochs: 80
+    tag: final
+
   # Ablations
-  resnet18_stft:                # representation: STFT instead of CWT (pending)
+  resnet18_stft:                # representation: STFT instead of CWT (CUDA, not run)
     script: entrenar_cnn
     repr: stft
+  resnet18_stft_mps:            # representation ablation as run (MPS, paired with resnet18_cwt_mps)
+    script: entrenar_cnn
+    repr: stft
+    device: mps
+    tag: mps
+    compare: eegnet_lr0.003_final
   resnet18_cwt_scratch:         # pretraining: same network without ImageNet weights
     script: entrenar_cnn
     repr: cwt
@@ -64,29 +78,35 @@ experiments:
     fold: 0
     seed: 0
 
-# Experiments run by `python train.py all`. resnet18_stft is not in the list because
-# it is still pending.
+# Experiments run by `python train.py all`, in this order. The two lr variants feed the
+# lr selection (`python evaluate.py lr`); eegnet_final uses its result.
 all:
   - eegnet
-  - resnet18_cwt
+  - resnet18_cwt_mps
   - eegnet_lr0.0003
   - eegnet_lr0.003
   - resnet18_cwt_lr1e-05
   - resnet18_cwt_lr3e-05
+  - eegnet_final
   - resnet18_cwt_scratch
+  - resnet18_stft_mps
   - diagnostico_eegnet
   - saliencia_cnn
 
 # Settings for evaluate.py
 evaluate:
   n_permutations: 2000
-  # Main comparison (A minus B) used for the per-subject failure analysis. The files in
-  # results/ were made with the MPS replication. Which ResNet18 run (JP's cuda
-  # resnet18_cwt or Alberto's resnet18_cwt_mps) is the primary one is still to be decided.
-  pair: [resnet18_cwt_mps, eegnet]
+  # Main comparison (A minus B) used for the per-subject failure analysis.
+  # Primary ResNet18 run: resnet18_cwt_mps. It ran on the same hardware and precision
+  # (Apple MPS, float32) as the final EEGNet and every ablation, so all paired comparisons
+  # differ in one factor only. JP's CUDA run (resnet18_cwt, mixed precision) is reported as
+  # a replication. Primary EEGNet run: eegnet_lr0.003_final (lr chosen on validation,
+  # same 80-epoch cap as ResNet18).
+  pair: [resnet18_cwt_mps, eegnet_lr0.003_final]
   # Models in the permutation test and the all-pairs bootstrap. null = every
   # *_scores.npz that is not an lr variant, which also includes the EEGNet diagnostics.
-  models: [eegnet, resnet18_cwt_mps, resnet18_cwt_scratch, resnet18_cwt]
+  models: [eegnet_lr0.003_final, resnet18_cwt_mps, resnet18_stft_mps, resnet18_cwt_scratch,
+           resnet18_cwt, eegnet]
 
 # --------------------------------------------------------------------------------------
 # Protocol. These values are fixed in src/. They are listed here for the report only.
@@ -107,8 +127,8 @@ protocol:
   bootstrap_resamples: 2000
   images: {size: 128, fmin_hz: 1, fmax_hz: 40, cwt_cycles: 6}
   eegnet: {F1: 8, D: 2, F2: 16, kernel_t: 125, kernel_sep: 32, dropout: 0.5,
-           optimizer: AdamW, lr: 1.0e-3, weight_decay: 0.01, batch: 128,
-           max_epochs: 40, patience: 8}
+           optimizer: AdamW, lr: 3.0e-3, weight_decay: 0.01, batch: 128,
+           max_epochs: 80, patience: 8}   # final run; diagnostics use lr 1e-3, 40 epochs
   resnet18: {weights: ImageNet, finetune: all layers, optimizer: AdamW, lr: 1.0e-4,
              weight_decay: 0.01, batch: 64, max_epochs: 80, patience: 8,
              amp: "cuda only (float32 on mps)"}

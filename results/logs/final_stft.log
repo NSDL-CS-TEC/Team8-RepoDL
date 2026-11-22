@@ -1,0 +1,63 @@
+
+=== eegnet_final: src/entrenar_eegnet.py  {'EEG_DATA_DIR': '/Users/alberto/Documents/Proyecto/data', 'EEG_DEVICE': 'mps', 'EEG_LR': '0.003', 'EEG_EPOCAS': '80', 'EEG_ETIQUETA': 'final'}
+Modelo: eegnet_lr0.003_final   dispositivo: mps   ventanas: 18087   sujetos: 26   modo rapido: False
+Canales: Fz, Pz, Oz   banda extra: ninguna (1-50 Hz de la etapa 2)   forma de X: (18087, 3, 750)
+
+/opt/anaconda3/envs/dl/lib/python3.13/site-packages/torch/nn/modules/conv.py:548: UserWarning: Using padding='same' with even kernel lengths and odd dilation may require a zero-padded copy of the input be created (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/Convolution.cpp:1026.)
+  return F.conv2d(
+semilla 0 fold 0: bal_acc 0.885  auroc 0.929  (mejor epoca 11, auroc val 0.866)  [22 s]
+semilla 0 fold 1: bal_acc 0.731  auroc 0.808  (mejor epoca 79, auroc val 0.902)  [113 s]
+semilla 0 fold 2: bal_acc 0.813  auroc 0.887  (mejor epoca 29, auroc val 0.882)  [159 s]
+semilla 0 fold 3: bal_acc 0.761  auroc 0.841  (mejor epoca 38, auroc val 0.914)  [214 s]
+semilla 0 fold 4: bal_acc 0.762  auroc 0.826  (mejor epoca 63, auroc val 0.893)  [304 s]
+semilla 1 fold 0: bal_acc 0.834  auroc 0.890  (mejor epoca 12, auroc val 0.864)  [329 s]
+semilla 1 fold 1: bal_acc 0.773  auroc 0.843  (mejor epoca 24, auroc val 0.861)  [366 s]
+semilla 1 fold 2: bal_acc 0.746  auroc 0.823  (mejor epoca 8, auroc val 0.801)  [385 s]
+semilla 1 fold 3: bal_acc 0.766  auroc 0.828  (mejor epoca 27, auroc val 0.869)  [430 s]
+semilla 1 fold 4: bal_acc 0.762  auroc 0.840  (mejor epoca 7, auroc val 0.853)  [448 s]
+semilla 2 fold 0: bal_acc 0.858  auroc 0.916  (mejor epoca 28, auroc val 0.886)  [490 s]
+semilla 2 fold 1: bal_acc 0.816  auroc 0.885  (mejor epoca 64, auroc val 0.892)  [578 s]
+semilla 2 fold 2: bal_acc 0.762  auroc 0.834  (mejor epoca 37, auroc val 0.876)  [638 s]
+semilla 2 fold 3: bal_acc 0.806  auroc 0.863  (mejor epoca 31, auroc val 0.914)  [682 s]
+semilla 2 fold 4: bal_acc 0.750  auroc 0.816  (mejor epoca 31, auroc val 0.848)  [730 s]
+
+===== RESUMEN eegnet_lr0.003_final (lr 0.003, semillas (0, 1, 2), validacion por sujeto) =====
+bal_acc: 0.788 +- 0.045   auroc: 0.855
+por sujeto: media 0.774  IC95 [0.753, 0.795]   sujetos sobre 0.5: 24/24
+epoca mejor (mediana): 29   tiempo total: 12.2 min
+criterio para elegir la tasa de aprendizaje, AUROC de validacion interna (semilla 0, media de folds): 0.8916
+
+Guardado en: /Users/alberto/Documents/Proyecto/results
+=== eegnet_final finished in 12.3 min
+
+=== resnet18_stft_mps: src/entrenar_cnn.py  {'EEG_DATA_DIR': '/Users/alberto/Documents/Proyecto/data', 'EEG_DEVICE': 'mps', 'EEG_REPR': 'stft', 'EEG_ETIQUETA': 'mps', 'EEG_COMPARE': 'eegnet_lr0.003_final'}
+Modelo: resnet18_stft_mps   dispositivo: mps   imagenes: (18087, 3, 128, 128)   preentrenado: True   lr: 0.0001   semillas: (0, 1, 2)   modo rapido: False
+
+semilla 0 fold 0: bal_acc 0.829  auroc 0.905  (mejor epoca 1, auroc val 0.813, 23.3 s/epoca)  [3.5 min]
+semilla 0 fold 1: bal_acc 0.707  auroc 0.771  (mejor epoca 1, auroc val 0.832, 22.9 s/epoca)  [7.0 min]
+semilla 0 fold 2: bal_acc 0.739  auroc 0.821  (mejor epoca 5, auroc val 0.820, 24.9 s/epoca)  [12.5 min]
+semilla 0 fold 3: bal_acc 0.728  auroc 0.821  (mejor epoca 1, auroc val 0.914, 23.8 s/epoca)  [16.1 min]
+semilla 0 fold 4: bal_acc 0.723  auroc 0.797  (mejor epoca 1, auroc val 0.852, 25.1 s/epoca)  [19.9 min]
+semilla 1 fold 0: bal_acc 0.831  auroc 0.892  (mejor epoca 14, auroc val 0.822, 24.6 s/epoca)  [28.9 min]
+semilla 1 fold 1: bal_acc 0.725  auroc 0.791  (mejor epoca 1, auroc val 0.820, 22.9 s/epoca)  [32.4 min]
+semilla 1 fold 2: bal_acc 0.740  auroc 0.824  (mejor epoca 1, auroc val 0.771, 23.2 s/epoca)  [35.9 min]
+semilla 1 fold 3: bal_acc 0.738  auroc 0.800  (mejor epoca 1, auroc val 0.853, 25.2 s/epoca)  [39.7 min]
+semilla 1 fold 4: bal_acc 0.745  auroc 0.820  (mejor epoca 9, auroc val 0.832, 24.4 s/epoca)  [46.7 min]
+semilla 2 fold 0: bal_acc 0.847  auroc 0.909  (mejor epoca 1, auroc val 0.821, 23.1 s/epoca)  [50.2 min]
+semilla 2 fold 1: bal_acc 0.772  auroc 0.844  (mejor epoca 1, auroc val 0.863, 24.6 s/epoca)  [53.9 min]
+semilla 2 fold 2: bal_acc 0.747  auroc 0.822  (mejor epoca 1, auroc val 0.867, 25.9 s/epoca)  [57.8 min]
+semilla 2 fold 3: bal_acc 0.740  auroc 0.815  (mejor epoca 1, auroc val 0.885, 22.9 s/epoca)  [61.3 min]
+semilla 2 fold 4: bal_acc 0.690  auroc 0.759  (mejor epoca 1, auroc val 0.772, 24.2 s/epoca)  [65.0 min]
+
+===== RESUMEN resnet18_stft_mps (lr 0.0001, semillas (0, 1, 2), validacion por sujeto) =====
+bal_acc: 0.753 +- 0.046   auroc: 0.826
+por sujeto: media 0.751  IC95 [0.730, 0.773]   sujetos sobre 0.5: 24/24
+epoca mejor (mediana): 1   tiempo total: 65.0 min
+criterio para elegir la tasa de aprendizaje, AUROC de validacion interna (semilla 0, media de folds): 0.8460
+
+===== resnet18_stft_mps contra eegnet_lr0.003_final =====
+diferencia de balanced accuracy por fold x semilla: media -0.035   resnet18_stft_mps mejor en 0/15
+diferencia por sujeto (n = 24): media -0.023   IC95 bootstrap [-0.036, -0.010]   el IC excluye 0: True
+
+Guardado en: /Users/alberto/Documents/Proyecto/results
+=== resnet18_stft_mps finished in 65.0 min

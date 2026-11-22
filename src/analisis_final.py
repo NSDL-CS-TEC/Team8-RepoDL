@@ -409,6 +409,23 @@ def main():
                f"bal_acc_{a}": (f"bal_acc_{a}", "mean")})
         print(g.round(3).to_string())
 
+    # desempeno por condicion a nivel de sesion (m = motion, n = motionless, segun el
+    # tutorial del dataset): balanced accuracy de las ventanas de cada condicion,
+    # promediada sobre semillas. Es un diagnostico, no un contraste preregistrado.
+    cond_rows = []
+    for name, sc in scores.items():
+        for c in ("m", "n"):
+            i = cond == c
+            vals = [bal_acc(y[i], s[i] >= 0.5) for s in sc.values()]
+            cond_rows.append(dict(modelo=name, condicion=c, sesiones=len(np.unique(session[i])),
+                                  ventanas=int(i.sum()), pct_lenta=float(y[i].mean()),
+                                  bal_acc=float(np.mean(vals))))
+    pd.DataFrame(cond_rows).to_csv(OUT_DIR / "por_condicion.csv", index=False)
+    print("\nPor condicion (ventanas de sesiones m o n): results/por_condicion.csv")
+    print(pd.DataFrame(cond_rows).pivot(index="modelo", columns="condicion",
+                                        values="bal_acc").round(3).to_string())
+
+    if a in scores and b in scores:
         # en que se diferencian los fallos de los dos modelos
         pa = np.mean([s >= 0.5 for s in scores[a].values()], axis=0) >= 0.5
         pb = np.mean([s >= 0.5 for s in scores[b].values()], axis=0) >= 0.5

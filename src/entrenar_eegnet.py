@@ -23,6 +23,8 @@ Variables de entorno (se fijan en la consola de Spyder con %env NOMBRE=valor):
   EEG_DEVICE forzar el dispositivo (cuda, mps o cpu). Por defecto se elige el mejor.
   EEG_LR     tasa de aprendizaje (por defecto 1e-3). Si se fija, los archivos de salida
              llevan la etiqueta, por ejemplo eegnet_lr0.0003_folds.csv.
+  EEG_EPOCAS tope de epocas (por defecto 40; la corrida final usa 80, igual que el CNN).
+  EEG_ETIQUETA sufijo extra para el nombre de salida, por ejemplo final.
   EEG_SEEDS  semillas separadas por coma (por defecto 0,1,2). Para el ajuste de la tasa
              de aprendizaje se usa solo 0.
   EEG_CANALES  subconjunto de canales, por ejemplo Fz o Fz,Pz (por defecto Fz,Pz,Oz).
@@ -72,7 +74,9 @@ MIN_PER_CLASS = 30
 N_BOOT = 2000
 
 # Hiperparametros (se mantienen fijos; la misma disciplina se aplica al CNN con imagenes)
-N_EPOCHS = 40
+N_EPOCHS = int(os.environ.get("EEG_EPOCAS", 40))
+if os.environ.get("EEG_ETIQUETA"):
+    MODEL_NAME += f"_{os.environ['EEG_ETIQUETA']}"
 PATIENCE = 8
 BATCH = 128
 WEIGHT_DECAY = 1e-2
