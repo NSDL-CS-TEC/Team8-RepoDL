@@ -10,7 +10,9 @@ Course final project by Juan Pablo Acevedo Robles and Alberto Martinez Hernandez
 
 **Result: the hypothesis is not supported.** On 24 subjects, EEGNet reaches 0.774 per-subject balanced accuracy and the ResNet18 0.750: Δ = −0.024, 95% CI [−0.037, −0.009]. EEGNet is better in 19 of 24 subjects (`results/comparacion_pareada.csv`, `results/tabla_principal.csv`).
 
-**Main runs.** The ResNet18 is `resnet18_cwt_mps` and EEGNet is `eegnet_lr0.003_final`. Both ran on the same hardware and precision (Apple MPS, float32), as did every ablation, so each paired comparison changes one factor only. JP's CUDA run (`resnet18_cwt`) and the initial EEGNet (`eegnet`, lr 1e-3, 40 epochs) are reported as replications and lead to the same conclusion.
+Sensitivity to the CNN learning rate. Juan Pablo's CUDA runs extend the learning-rate grid of the ResNet18 to 1e-5, 3e-5, 1e-4, 3e-4 and 3e-3. On the same validation rule, 3e-4 scores highest (AUROC 0.883 against 0.868 for 1e-4). At 3e-4 the per-subject difference is +0.000, 95% CI [−0.015, +0.017]. The hypothesis is not supported in either case: EEGNet is slightly better at the default CNN learning rate, and the gap closes at the best rate on validation.
+
+**Main runs.** The ResNet18 is `resnet18_cwt_mps` and EEGNet is `eegnet_lr0.003_final`. Both ran on the same hardware and precision (Apple MPS, float32), as did every ablation, so each paired comparison changes one factor only. Juan Pablo's CUDA run (`resnet18_cwt`) and the initial EEGNet (`eegnet`, lr 1e-3, 40 epochs) are reported as replications and lead to the same conclusion.
 
 The report, slides and one-page summary (PDF and LaTeX source) are in `report/` (see `report/README.md`). The original protocol document (16 Nov) is archived in `report/archive/`; its numbers predate the final runs.
 
@@ -100,7 +102,7 @@ The final set is **18,087 windows**: 13,094 fast and 4,993 slow (27.6% slow).
 | Logistic regression on log band power (θ, α, β × 3 channels) | 9 features | 10 | scikit-learn, class-balanced |
 
 - **Objective.** Binary cross-entropy on the logit of the *slow* class, weighted by the class ratio of the training set.
-- **Learning rates.** We compared 3 values per model on seed 0 using internal-validation AUROC (`python evaluate.py lr`). The selections were EEGNet 3e-3 (AUROC 0.883) and ResNet18 1e-4 (0.868). The final EEGNet (`eegnet_final`) uses 3e-3 and the same 80-epoch cap as ResNet18. The earlier `eegnet` run (1e-3, 40 epochs) is kept, because the channel/band diagnostics were run with that configuration and are compared against it.
+- **Learning rates.** We compared 3 values per model on seed 0 using internal-validation AUROC (`python evaluate.py lr`). The selections were EEGNet 3e-3 (AUROC 0.883) and, within the three rates run on MPS, ResNet18 1e-4 (0.868). The extended CUDA grid selects 3e-4 for the ResNet18 (0.883); those runs are reported as a sensitivity analysis (results/respaldo_cuda_jp/). The final EEGNet (`eegnet_final`) uses 3e-3 and the same 80-epoch cap as ResNet18. The earlier `eegnet` run (1e-3, 40 epochs) is kept, because the channel/band diagnostics were run with that configuration and are compared against it.
 - **No learning-rate schedule.** The rate is constant and there is no augmentation; the decision threshold is 0.5.
 - **Metrics.**
   - The primary metric is balanced accuracy on unseen subjects. AUROC is a secondary metric.
@@ -113,10 +115,10 @@ The final set is **18,087 windows**: 13,094 fast and 4,993 slow (27.6% slow).
   - Classical baselines, a trial-index baseline, and a shuffled-label control (`baselines_*.csv`).
 
 **Hardware.**
-- JP: NVIDIA RTX 3080 (CUDA, mixed precision). About 11 s per ResNet18 epoch.
+- Juan Pablo: NVIDIA RTX 3080 (CUDA, mixed precision). About 11 s per ResNet18 epoch.
 - Alberto: Apple M1 Pro (MPS, float32). About 23 s per ResNet18 epoch; the final EEGNet takes 12 min for 15 trainings.
 
-`results/respaldo_cuda_jp/` keeps JP's original CUDA outputs, including the lr-check runs. The runs in `results/logs/` ran on MPS: EEGNet, its diagnostics, `resnet18_cwt_mps`, `resnet18_cwt_scratch`, `eegnet_lr0.003_final` and `resnet18_stft_mps`. CUDA and MPS runs are not bitwise identical, which is why `resnet18_cwt` (CUDA) and `resnet18_cwt_mps` are reported separately.
+`results/respaldo_cuda_jp/` keeps Juan Pablo's original CUDA outputs, including the lr-check runs. The runs in `results/logs/` ran on MPS: EEGNet, its diagnostics, `resnet18_cwt_mps`, `resnet18_cwt_scratch`, `eegnet_lr0.003_final` and `resnet18_stft_mps`. CUDA and MPS runs are not bitwise identical, which is why `resnet18_cwt` (CUDA) and `resnet18_cwt_mps` are reported separately.
 
 ## Storage policy
 
