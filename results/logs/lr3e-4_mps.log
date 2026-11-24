@@ -1,0 +1,64 @@
+
+=== resnet18_cwt_lr3e-4_mps: src/entrenar_cnn.py  {'EEG_DATA_DIR': '/Users/alberto/Documents/Proyecto/data', 'EEG_REPR': 'cwt', 'EEG_LR': '0.0003', 'EEG_DEVICE': 'mps', 'EEG_ETIQUETA': 'mps', 'EEG_COMPARE': 'eegnet_lr0.003_final'}
+Modelo: resnet18_cwt_lr0.0003_mps   dispositivo: mps   imagenes: (18087, 3, 128, 128)   preentrenado: True   lr: 0.0003   semillas: (0, 1, 2)   modo rapido: False
+
+semilla 0 fold 0: bal_acc 0.846  auroc 0.922  (mejor epoca 1, auroc val 0.844, 23.1 s/epoca)  [3.5 min]
+semilla 0 fold 1: bal_acc 0.671  auroc 0.759  (mejor epoca 15, auroc val 0.858, 22.9 s/epoca)  [12.3 min]
+semilla 0 fold 2: bal_acc 0.779  auroc 0.859  (mejor epoca 4, auroc val 0.849, 24.9 s/epoca)  [17.3 min]
+semilla 0 fold 3: bal_acc 0.713  auroc 0.837  (mejor epoca 2, auroc val 0.932, 23.7 s/epoca)  [21.3 min]
+semilla 0 fold 4: bal_acc 0.775  auroc 0.840  (mejor epoca 1, auroc val 0.886, 25.1 s/epoca)  [25.1 min]
+semilla 1 fold 0: bal_acc 0.843  auroc 0.907  (mejor epoca 1, auroc val 0.834, 24.6 s/epoca)  [28.8 min]
+semilla 1 fold 1: bal_acc 0.751  auroc 0.835  (mejor epoca 1, auroc val 0.854, 22.9 s/epoca)  [32.3 min]
+semilla 1 fold 2: bal_acc 0.759  auroc 0.853  (mejor epoca 1, auroc val 0.790, 23.3 s/epoca)  [35.8 min]
+semilla 1 fold 3: bal_acc 0.723  auroc 0.811  (mejor epoca 1, auroc val 0.848, 25.3 s/epoca)  [39.7 min]
+semilla 1 fold 4: bal_acc 0.713  auroc 0.838  (mejor epoca 1, auroc val 0.830, 24.5 s/epoca)  [43.4 min]
+semilla 2 fold 0: bal_acc 0.835  auroc 0.919  (mejor epoca 1, auroc val 0.839, 23.2 s/epoca)  [46.9 min]
+semilla 2 fold 1: bal_acc 0.774  auroc 0.849  (mejor epoca 1, auroc val 0.890, 24.5 s/epoca)  [50.6 min]
+semilla 2 fold 2: bal_acc 0.759  auroc 0.837  (mejor epoca 1, auroc val 0.860, 25.9 s/epoca)  [54.5 min]
+semilla 2 fold 3: bal_acc 0.773  auroc 0.853  (mejor epoca 1, auroc val 0.907, 22.9 s/epoca)  [58.0 min]
+semilla 2 fold 4: bal_acc 0.709  auroc 0.784  (mejor epoca 3, auroc val 0.819, 24.3 s/epoca)  [62.5 min]
+
+===== RESUMEN resnet18_cwt_lr0.0003_mps (lr 0.0003, semillas (0, 1, 2), validacion por sujeto) =====
+bal_acc: 0.761 +- 0.052   auroc: 0.847
+por sujeto: media 0.761  IC95 [0.738, 0.784]   sujetos sobre 0.5: 24/24
+epoca mejor (mediana): 1   tiempo total: 62.5 min
+criterio para elegir la tasa de aprendizaje, AUROC de validacion interna (semilla 0, media de folds): 0.8737
+
+===== resnet18_cwt_lr0.0003_mps contra eegnet_lr0.003_final =====
+diferencia de balanced accuracy por fold x semilla: media -0.027   resnet18_cwt_lr0.0003_mps mejor en 3/15
+diferencia por sujeto (n = 24): media -0.013   IC95 bootstrap [-0.027, +0.002]   el IC excluye 0: False
+
+Guardado en: /Users/alberto/Documents/Proyecto/results
+=== resnet18_cwt_lr3e-4_mps finished in 62.5 min
+
+=== resnet18_stft_lr3e-4_mps: src/entrenar_cnn.py  {'EEG_DATA_DIR': '/Users/alberto/Documents/Proyecto/data', 'EEG_REPR': 'stft', 'EEG_LR': '0.0003', 'EEG_DEVICE': 'mps', 'EEG_ETIQUETA': 'mps', 'EEG_COMPARE': 'eegnet_lr0.003_final'}
+Modelo: resnet18_stft_lr0.0003_mps   dispositivo: mps   imagenes: (18087, 3, 128, 128)   preentrenado: True   lr: 0.0003   semillas: (0, 1, 2)   modo rapido: False
+
+semilla 0 fold 0: bal_acc 0.847  auroc 0.922  (mejor epoca 1, auroc val 0.837, 22.8 s/epoca)  [3.5 min]
+semilla 0 fold 1: bal_acc 0.702  auroc 0.775  (mejor epoca 8, auroc val 0.853, 22.8 s/epoca)  [9.6 min]
+semilla 0 fold 2: bal_acc 0.786  auroc 0.865  (mejor epoca 2, auroc val 0.842, 24.8 s/epoca)  [13.7 min]
+semilla 0 fold 3: bal_acc 0.743  auroc 0.830  (mejor epoca 1, auroc val 0.922, 23.7 s/epoca)  [17.3 min]
+semilla 0 fold 4: bal_acc 0.725  auroc 0.809  (mejor epoca 7, auroc val 0.879, 25.1 s/epoca)  [23.6 min]
+semilla 1 fold 0: bal_acc 0.809  auroc 0.874  (mejor epoca 8, auroc val 0.836, 24.6 s/epoca)  [30.2 min]
+semilla 1 fold 1: bal_acc 0.722  auroc 0.819  (mejor epoca 1, auroc val 0.846, 22.8 s/epoca)  [33.7 min]
+semilla 1 fold 2: bal_acc 0.746  auroc 0.849  (mejor epoca 1, auroc val 0.798, 23.2 s/epoca)  [37.2 min]
+semilla 1 fold 3: bal_acc 0.680  auroc 0.817  (mejor epoca 4, auroc val 0.869, 25.2 s/epoca)  [42.3 min]
+semilla 1 fold 4: bal_acc 0.758  auroc 0.841  (mejor epoca 2, auroc val 0.828, 24.4 s/epoca)  [46.4 min]
+semilla 2 fold 0: bal_acc 0.851  auroc 0.922  (mejor epoca 1, auroc val 0.849, 23.1 s/epoca)  [49.9 min]
+semilla 2 fold 1: bal_acc 0.772  auroc 0.855  (mejor epoca 1, auroc val 0.879, 24.5 s/epoca)  [53.6 min]
+semilla 2 fold 2: bal_acc 0.745  auroc 0.829  (mejor epoca 1, auroc val 0.876, 25.9 s/epoca)  [57.5 min]
+semilla 2 fold 3: bal_acc 0.755  auroc 0.812  (mejor epoca 2, auroc val 0.909, 22.9 s/epoca)  [61.3 min]
+semilla 2 fold 4: bal_acc 0.708  auroc 0.800  (mejor epoca 1, auroc val 0.806, 24.2 s/epoca)  [65.0 min]
+
+===== RESUMEN resnet18_stft_lr0.0003_mps (lr 0.0003, semillas (0, 1, 2), validacion por sujeto) =====
+bal_acc: 0.757 +- 0.050   auroc: 0.841
+por sujeto: media 0.755  IC95 [0.730, 0.779]   sujetos sobre 0.5: 24/24
+epoca mejor (mediana): 1   tiempo total: 65.0 min
+criterio para elegir la tasa de aprendizaje, AUROC de validacion interna (semilla 0, media de folds): 0.8668
+
+===== resnet18_stft_lr0.0003_mps contra eegnet_lr0.003_final =====
+diferencia de balanced accuracy por fold x semilla: media -0.032   resnet18_stft_lr0.0003_mps mejor en 1/15
+diferencia por sujeto (n = 24): media -0.020   IC95 bootstrap [-0.039, -0.002]   el IC excluye 0: True
+
+Guardado en: /Users/alberto/Documents/Proyecto/results
+=== resnet18_stft_lr3e-4_mps finished in 65.1 min

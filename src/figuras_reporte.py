@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parent.parent
 RES, FIG = ROOT / "results", ROOT / "figures"
 N_BOOT, RNG = 2000, np.random.default_rng(0)
 
-MAIN_A = os.environ.get("EEG_MAIN_A", "resnet18_cwt_mps")
+MAIN_A = os.environ.get("EEG_MAIN_A", "resnet18_cwt_lr0.0003_mps")
 MAIN_B = os.environ.get("EEG_MAIN_B", "eegnet_lr0.003_final")
 
 # (file stem, label, group) in table order
@@ -30,11 +30,12 @@ MODELS = [
     ("indice_ensayo", "Trial position (drift control)", "control"),
     ("potencia_bandas_zsesion", "Band power + LR, session z-score", "classical"),
     ("potencia_bandas", "Band power + LR", "classical"),
-    ("resnet18_cwt_scratch", "ResNet18, CWT, no pretraining", "ablation"),
-    ("resnet18_stft_mps", "ResNet18, STFT, ImageNet", "ablation"),
-    ("resnet18_cwt", "ResNet18, CWT, ImageNet (CUDA replication)", "replication"),
+    ("resnet18_cwt_scratch", "ResNet18, CWT, no pretraining (lr 1e-4)", "ablation"),
+    ("resnet18_stft_lr0.0003_mps", "ResNet18, STFT, ImageNet", "ablation"),
+    ("resnet18_cwt_mps", "ResNet18, CWT, lr 1e-4 (previous main)", "replication"),
+    ("resnet18_cwt_lr0.0003", "ResNet18, CWT (CUDA replication)", "replication"),
     ("eegnet", "EEGNet, lr 1e-3, 40 epochs (initial run)", "replication"),
-    ("resnet18_cwt_mps", "ResNet18, CWT, ImageNet (main)", "main"),
+    ("resnet18_cwt_lr0.0003_mps", "ResNet18, CWT, ImageNet (main)", "main"),
     ("eegnet_lr0.003_final", "EEGNet, raw signal (main baseline)", "main"),
 ]
 COLORS = {"control": "#9aa5b1", "classical": "#7b8794", "ablation": "#2f9e8f",

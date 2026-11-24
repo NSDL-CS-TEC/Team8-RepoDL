@@ -20,7 +20,10 @@ elif (HERE.parents[1] / "results").is_dir():   # copy inside the repo: report/01
 else:
     PROJ = Path("/Users/alberto/Documents/Proyecto")
 RES, FIG = PROJ / "results", PROJ / "figures"
-A, B = "resnet18_cwt_mps", "eegnet_lr0.003_final"
+A, B = "resnet18_cwt_lr0.0003_mps", "eegnet_lr0.003_final"
+A_OLD = "resnet18_cwt_mps"                 # previous main run, lr 1e-4 (edge of the first grid)
+STFT, STFT_OLD = "resnet18_stft_lr0.0003_mps", "resnet18_stft_mps"
+JP = RES / "respaldo_cuda_jp"               # Juan Pablo's CUDA runs (per-subject CSVs only)
 
 tab = pd.read_csv(RES / "tabla_principal.csv").set_index("modelo")
 comp = pd.read_csv(RES / "comparacion_pareada.csv")
@@ -37,6 +40,16 @@ def pair(a, b):
     r = comp[(comp.modelo_a == b) & (comp.modelo_b == a)].iloc[0]
     n_b, n = map(int, r.a_mejor_en.split("/"))
     return -r.delta_medio, -r.ic95_alto, -r.ic95_bajo, f"{n - n_b}/{n}"
+
+
+def pair_csv(a, b, rng_seed=0, n_boot=2000):
+    """Paired per-subject delta a - b from two *_por_sujeto.csv paths (no scores file needed)."""
+    sa = pd.read_csv(a).set_index("subject").bal_acc
+    sb = pd.read_csv(b).set_index("subject").bal_acc
+    dd = (sa - sb).dropna().to_numpy()
+    rng = np.random.default_rng(rng_seed)
+    lo_, hi_ = np.percentile(rng.choice(dd, (n_boot, len(dd))).mean(1), [2.5, 97.5])
+    return dd.mean(), lo_, hi_, f"{int((dd > 0).sum())}/{len(dd)}"
 
 
 def f3(x):
@@ -58,33 +71,51 @@ m["deltaMain"], m["ciMain"], m["resBetter"] = f3(d), ci(lo, hi), better.replace(
 _nb, _n = map(int, better.split("/"))
 m["eegBetter"] = str(_n - _nb - int(((subj[f"bal_acc_{A}"] - subj[f"bal_acc_{B}"]).dropna() == 0).sum()))
 m["resMainSubj"], m["eegMainSubj"] = subjtxt(A), subjtxt(B)
-if hi < 0:
+m["hypVerdict"] = "supported" if lo > 0 else "not supported"
+if lo > 0:
+    m["mainVerdict"] = ("the mean $\\Delta$ is positive and its interval excludes zero, so the CNN "
+                        "on scalograms is significantly better than EEGNet on the raw signal.")
+elif hi < 0:
     m["mainVerdict"] = ("the mean $\\Delta$ is negative and its interval excludes zero, so EEGNet "
                         "on the raw signal is significantly better than the CNN on scalograms.")
-elif d < 0:
-    m["mainVerdict"] = ("the mean $\\Delta$ is negative and its interval includes zero, so the CNN "
-                        "on scalograms is not better than EEGNet, and probably slightly worse.")
 else:
-    m["mainVerdict"] = ("the mean $\\Delta$ is positive but its interval includes zero, so the "
-                        "evidence does not meet the decision rule.")
+    m["mainVerdict"] = ("the interval includes zero, so the CNN on scalograms is not better than "
+                        "EEGNet on the raw signal; the two are statistically indistinguishable.")
 
 d2, *_ = pair(A, "eegnet")
 m["deltaInitial"] = f3(d2)
-d3, *_ = pair("resnet18_cwt", B)
-m["deltaCuda"] = f3(d3)
-d4, l4, h4, _ = pair("resnet18_cwt", A)
-m["deltaCudaMps"], m["ciCudaMps"] = f3(d4), ci(l4, h4)
+# previous main run (ResNet18 at lr 1e-4) and the gain from the validation-selected lr
+d7, l7, h7, b7 = pair(A_OLD, B)
+m["deltaOldLr"], m["ciOldLr"], m["oldLrSubj"] = f3(d7), ci(l7, h7), subjtxt(A_OLD)
+m["oldLrBetter"] = b7.replace("/", " of ")
+d8, l8, h8, b8 = pair(A, A_OLD)
+m["deltaLrGain"], m["ciLrGain"], m["lrGainBetter"] = f3(d8), ci(l8, h8), b8.replace("/", " of ")
 
-d5, l5, h5, _ = pair(A, "resnet18_cwt_scratch")
+# CUDA replication (Juan Pablo, RTX 3080, mixed precision), from per-subject CSVs
+cuda_a = JP / "resnet18_cwt_lr0.0003_por_sujeto.csv"
+d3, l3, h3, _ = pair_csv(cuda_a, RES / f"{B}_por_sujeto.csv")
+m["deltaCuda"], m["ciCuda"] = f3(d3), ci(l3, h3)
+d4, l4, h4, _ = pair_csv(cuda_a, RES / f"{A}_por_sujeto.csv")
+m["deltaCudaMps"], m["ciCudaMps"] = f3(d4), ci(l4, h4)
+d9, l9, h9, _ = pair_csv(cuda_a, JP / "eegnet_lr0.003_por_sujeto.csv")
+m["deltaCudaPair"], m["ciCudaPair"] = f3(d9), ci(l9, h9)
+d10, l10, h10, _ = pair_csv(cuda_a, JP / "resnet18_stft_lr0.0003_por_sujeto.csv")
+m["deltaStftCuda"], m["ciStftCuda"] = f3(d10), ci(l10, h10)
+
+# pretraining ablation: the scratch run used lr 1e-4, so it is paired with the 1e-4 run
+d5, l5, h5, _ = pair(A_OLD, "resnet18_cwt_scratch")
 m["deltaScratch"], m["ciScratch"], m["scratchSubj"] = f3(d5), ci(l5, h5), subjtxt("resnet18_cwt_scratch")
 
 try:
-    d6, l6, h6, _ = pair(A, "resnet18_stft_mps")
-    m["deltaStft"], m["ciStft"], m["stftSubj"] = f3(d6), ci(l6, h6), subjtxt("resnet18_stft_mps")
+    d6, l6, h6, _ = pair(A, STFT)
+    m["deltaStft"], m["ciStft"], m["stftSubj"] = f3(d6), ci(l6, h6), subjtxt(STFT)
+    d11, l11, h11, _ = pair(A_OLD, STFT_OLD)
+    m["deltaStftOld"], m["ciStftOld"] = f3(d11), ci(l11, h11)
 except (IndexError, KeyError):   # STFT run not finished yet: draft placeholders
-    print("WARNING: resnet18_stft_mps missing, writing placeholders")
+    print(f"WARNING: {STFT} missing, writing placeholders")
     d6 = l6 = h6 = float("nan")
     m["deltaStft"] = m["ciStft"] = m["stftSubj"] = "\\textbf{??}"
+    m["deltaStftOld"] = m["ciStftOld"] = "\\textbf{??}"
 if l6 > 0:
     m["stftVerdict"] = "differently, with wavelets ahead"
     m["stftSentence"] = "the wavelet's adaptive time--frequency resolution gives a small but reliable gain."
@@ -132,6 +163,8 @@ lines = ["\\begin{tabular}{@{}llcccc@{}}", "\\toprule",
 inputs = {"control_permutado": "band power", "indice_ensayo": "trial index",
           "potencia_bandas_zsesion": "band power", "potencia_bandas": "band power",
           "resnet18_cwt_scratch": "CWT image", "resnet18_stft_mps": "STFT image",
+          "resnet18_stft_lr0.0003_mps": "STFT image", "resnet18_cwt_lr0.0003_mps": "CWT image",
+          "resnet18_cwt_lr0.0003": "CWT image",
           "resnet18_cwt": "CWT image", "eegnet": "raw $3\\times750$",
           "resnet18_cwt_mps": "CWT image", "eegnet_lr0.003_final": "raw $3\\times750$"}
 prev = None
@@ -149,11 +182,12 @@ lines += ["\\bottomrule", "\\end{tabular}"]
 
 perm = pd.read_csv(RES / "permutacion.csv")
 perm = perm[perm.estadistico == "por_sujeto"]
-names = {"eegnet_lr0.003_final": "EEGNet (main)", "resnet18_cwt_mps": "ResNet18 CWT (main)",
-         "resnet18_stft_mps": "ResNet18 STFT", "resnet18_cwt_scratch": "ResNet18 scratch",
-         "resnet18_cwt": "ResNet18 CWT (CUDA)", "eegnet": "EEGNet (initial)"}
+names = {"eegnet_lr0.003_final": "EEGNet (main)", "resnet18_cwt_lr0.0003_mps": "ResNet18 CWT (main)",
+         "resnet18_stft_lr0.0003_mps": "ResNet18 STFT", "resnet18_cwt_mps": "ResNet18 CWT, $10^{-4}$",
+         "resnet18_stft_mps": "ResNet18 STFT, $10^{-4}$", "resnet18_cwt_scratch": "ResNet18 scratch",
+         "resnet18_cwt": "ResNet18 CWT, $10^{-4}$, CUDA", "eegnet": "EEGNet (initial)"}
 pl = ["\\begin{tabular}{@{}lcccc@{}}", "\\toprule",
-      "Model & Observed & Chance (shuffle) & Chance (shift) & $p$ \\\\", "\\midrule"]
+      "Model & Observed & Shuffle & Shift & $p$ \\\\", "\\midrule"]
 for mod, g in perm.groupby("modelo", sort=False):
     sh = g[g.nula == "barajado"].iloc[0]
     ci_ = g[g.nula == "desplazamiento"].iloc[0]

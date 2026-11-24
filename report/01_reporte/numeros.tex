@@ -1,26 +1,41 @@
-\newcommand{\deltaMain}{$-$0.024}
-\newcommand{\ciMain}{[$-$0.037, $-$0.009]}
-\newcommand{\resBetter}{5 of 24}
-\newcommand{\eegBetter}{19}
-\newcommand{\resMainSubj}{0.750}
+\newcommand{\deltaMain}{$-$0.013}
+\newcommand{\ciMain}{[$-$0.027, +0.002]}
+\newcommand{\resBetter}{7 of 24}
+\newcommand{\eegBetter}{17}
+\newcommand{\resMainSubj}{0.761}
 \newcommand{\eegMainSubj}{0.774}
-\newcommand{\mainVerdict}{the mean $\Delta$ is negative and its interval excludes zero, so EEGNet on the raw signal is significantly better than the CNN on scalograms.}
-\newcommand{\deltaInitial}{$-$0.016}
-\newcommand{\deltaCuda}{$-$0.020}
-\newcommand{\deltaCudaMps}{+0.004}
-\newcommand{\ciCudaMps}{[$-$0.003, +0.011]}
+\newcommand{\hypVerdict}{not supported}
+\newcommand{\mainVerdict}{the interval includes zero, so the CNN on scalograms is not better than EEGNet on the raw signal; the two are statistically indistinguishable.}
+\newcommand{\deltaInitial}{$-$0.005}
+\newcommand{\deltaOldLr}{$-$0.024}
+\newcommand{\ciOldLr}{[$-$0.037, $-$0.009]}
+\newcommand{\oldLrSubj}{0.750}
+\newcommand{\oldLrBetter}{5 of 24}
+\newcommand{\deltaLrGain}{+0.011}
+\newcommand{\ciLrGain}{[+0.005, +0.017]}
+\newcommand{\lrGainBetter}{18 of 24}
+\newcommand{\deltaCuda}{$-$0.007}
+\newcommand{\ciCuda}{[$-$0.023, +0.009]}
+\newcommand{\deltaCudaMps}{+0.006}
+\newcommand{\ciCudaMps}{[$-$0.002, +0.013]}
+\newcommand{\deltaCudaPair}{+0.000}
+\newcommand{\ciCudaPair}{[$-$0.015, +0.017]}
+\newcommand{\deltaStftCuda}{+0.006}
+\newcommand{\ciStftCuda}{[$-$0.000, +0.012]}
 \newcommand{\deltaScratch}{+0.015}
 \newcommand{\ciScratch}{[+0.004, +0.025]}
 \newcommand{\scratchSubj}{0.735}
-\newcommand{\deltaStft}{$-$0.001}
-\newcommand{\ciStft}{[$-$0.010, +0.007]}
-\newcommand{\stftSubj}{0.751}
+\newcommand{\deltaStft}{+0.007}
+\newcommand{\ciStft}{[$-$0.005, +0.019]}
+\newcommand{\stftSubj}{0.755}
+\newcommand{\deltaStftOld}{$-$0.001}
+\newcommand{\ciStftOld}{[$-$0.010, +0.007]}
 \newcommand{\stftVerdict}{indistinguishably}
 \newcommand{\stftSentence}{the interval includes zero, so the choice of time--frequency transform does not measurably matter here.}
 \newcommand{\stftShort}{makes no measurable difference}
 \newcommand{\worstRange}{0.65 to 0.89 for EEGNet}
 \newcommand{\worstSubjects}{22 (0.65, 51\% slow), 9 (0.69, 34\% slow), 31 (0.71, 21\% slow), 6 (0.71, 20\% slow)}
-\newcommand{\condText}{0.791 (motion) vs.\ 0.782 (motionless) for EEGNet and 0.752 vs.\ 0.748 for ResNet18; a descriptive, not pre-registered, contrast.}
-\newcommand{\agreePct}{85.7\%}
-\newcommand{\disagree}{EEGNet 57.6\% vs.\ ResNet18 42.4\%}
-\newcommand{\bothWrongSlow}{34.9\%}
+\newcommand{\condText}{0.791 (motion) vs.\ 0.782 (motionless) for EEGNet and 0.759 vs.\ 0.760 for ResNet18; a descriptive, not pre-registered, contrast.}
+\newcommand{\agreePct}{86.2\%}
+\newcommand{\disagree}{EEGNet 58.3\% vs.\ ResNet18 41.7\%}
+\newcommand{\bothWrongSlow}{32.2\%}

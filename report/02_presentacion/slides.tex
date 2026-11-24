@@ -70,7 +70,7 @@ Cao et al.\ 2019: 26 subjects, 61 sessions, \textbf{18{,}087 windows} (27.6\% sl
 \toprule
 Role & Model & Input & Params & Training \\
 \midrule
-Main & ResNet18, ImageNet, full fine-tune & CWT $3\times128\times128$ & 11.2\,M & AdamW lr $10^{-4}$, batch 64 \\
+Main & ResNet18, ImageNet, full fine-tune & CWT $3\times128\times128$ & 11.2\,M & AdamW lr $3\!\times\!10^{-4}$, batch 64 \\
 Baseline & EEGNet v4, from scratch & raw $1\times3\times750$ & 2{,}265 & AdamW lr $3\!\times\!10^{-3}$, batch 128 \\
 Classical & Logistic reg.\ on log band power & 9 features & 10 & class-balanced \\
 Controls & trial position; shuffled labels & & & \\
@@ -81,7 +81,7 @@ Controls & trial position; shuffled labels & & & \\
 \begin{itemize}
 \item \textbf{Loss:} class-weighted binary cross-entropy on the slow logit
 \item Same cap (80 epochs), patience 8, early stopping on 4 held-out \emph{training} subjects
-\item \textbf{Matched tuning:} 3 learning rates per model, seed 0, chosen on validation AUROC only
+\item \textbf{Matched tuning:} learning rate chosen on validation AUROC only (seed 0); CNN grid widened when its best rate sat at the edge
 \end{itemize}
 \end{frame}
 
@@ -103,11 +103,12 @@ Controls & trial position; shuffled labels & & & \\
 \includegraphics[width=0.92\textwidth]{fig_resultados}
 
 \small
-EEGNet \eegMainSubj{} vs.\ ResNet18 \resMainSubj{}. $\Delta=\deltaMain$, 95\% CI \ciMain{}; ResNet18 better in \resBetter{} subjects.
+EEGNet \eegMainSubj{} vs.\ ResNet18 \resMainSubj{}. $\Delta=\deltaMain$, 95\% CI \ciMain{}: statistically a tie; ResNet18 better in \resBetter{} subjects.
 \end{frame}
 
 \begin{frame}{Is the result robust?}
 \begin{itemize}
+\item ResNet18 at the first grid's lr $10^{-4}$: $\Delta=\deltaOldLr$, CI \ciOldLr{} $\rightarrow$ ``EEGNet better'' was a tuning artifact; $3\!\times\!10^{-4}$ gains $\deltaLrGain$
 \item Initial EEGNet (lr $10^{-3}$, 40 epochs): $\Delta=\deltaInitial$
 \item CUDA replication of ResNet18: $\Delta=\deltaCuda$; CUDA vs.\ MPS differ by $\deltaCudaMps$ (CI \ciCudaMps)
 \item Both networks $\gg$ band power (0.681), trial position (0.567), shuffled labels (0.491)
@@ -121,7 +122,7 @@ EEGNet \eegMainSubj{} vs.\ ResNet18 \resMainSubj{}. $\Delta=\deltaMain$, 95\% CI
 \begin{frame}{Ablations: one factor at a time}
 \begin{columns}[T]
 \column{0.5\textwidth}
-\textbf{Pretraining} (same ResNet18, CWT)
+\textbf{Pretraining} (same ResNet18, CWT, lr $10^{-4}$)
 \begin{itemize}\small
 \item ImageNet $-$ scratch: $\deltaScratch$, CI \ciScratch
 \item Pretraining helps despite the domain gap
@@ -169,7 +170,7 @@ EEGNet \eegMainSubj{} vs.\ ResNet18 \resMainSubj{}. $\Delta=\deltaMain$, 95\% CI
 \item Labels are behavioral and session-relative, not a ground truth of drowsiness
 \item Per-session z-score uses unlabeled test-session data (calibration period needed)
 \item Slow trials cluster in time: windows not independent (we resample subjects)
-\item ResNet18 peaks in 1--3 epochs; schedules, augmentation, freezing not explored
+\item ResNet18 peaks in 1--3 epochs and is lr-sensitive; schedules, augmentation, freezing not explored
 \item EEGNet sometimes still improving at 80 epochs (gap can only widen)
 \item One dataset, three channels: no claim about pain or trust yet
 \end{itemize}

@@ -70,8 +70,26 @@ experiments:
     device: mps
     tag: mps
 
+  # ResNet18 at the lr chosen on validation once JP widened the CUDA grid to 3e-4 and 3e-3
+  # (seed 0: 3e-4 gives AUROC 0.883 vs 0.868 at 1e-4). Same hardware as eegnet_lr0.003_final.
+  # Outputs: resnet18_cwt_lr0.0003_mps, resnet18_stft_lr0.0003_mps
+  resnet18_cwt_lr3e-4_mps:
+    script: entrenar_cnn
+    repr: cwt
+    lr: 3.0e-4
+    device: mps
+    tag: mps
+    compare: eegnet_lr0.003_final
+  resnet18_stft_lr3e-4_mps:
+    script: entrenar_cnn
+    repr: stft
+    lr: 3.0e-4
+    device: mps
+    tag: mps
+    compare: eegnet_lr0.003_final
+
   # Diagnostics
-  diagnostico_eegnet:           # EEGNet by channel and by band (7 variants + table/figure)
+  diagnostico_eegnet:          # EEGNet by channel and by band (7 variants + table/figure)
     script: diagnostico_eegnet
   saliencia_cnn:                # Grad-CAM on one ResNet18 (fold 0, seed 0)
     script: saliencia_cnn
@@ -90,6 +108,8 @@ all:
   - eegnet_final
   - resnet18_cwt_scratch
   - resnet18_stft_mps
+  - resnet18_cwt_lr3e-4_mps
+  - resnet18_stft_lr3e-4_mps
   - diagnostico_eegnet
   - saliencia_cnn
 
@@ -97,16 +117,17 @@ all:
 evaluate:
   n_permutations: 2000
   # Main comparison (A minus B) used for the per-subject failure analysis.
-  # Primary ResNet18 run: resnet18_cwt_mps. It ran on the same hardware and precision
+  # Primary ResNet18 run: resnet18_cwt_lr0.0003_mps (lr chosen on validation after JP widened
+  # the grid; the earlier main run at 1e-4, resnet18_cwt_mps, is kept as a sensitivity check). It ran on the same hardware and precision
   # (Apple MPS, float32) as the final EEGNet and every ablation, so all paired comparisons
   # differ in one factor only. JP's CUDA run (resnet18_cwt, mixed precision) is reported as
   # a replication. Primary EEGNet run: eegnet_lr0.003_final (lr chosen on validation,
   # same 80-epoch cap as ResNet18).
-  pair: [resnet18_cwt_mps, eegnet_lr0.003_final]
+  pair: [resnet18_cwt_lr0.0003_mps, eegnet_lr0.003_final]
   # Models in the permutation test and the all-pairs bootstrap. null = every
   # *_scores.npz that is not an lr variant, which also includes the EEGNet diagnostics.
-  models: [eegnet_lr0.003_final, resnet18_cwt_mps, resnet18_stft_mps, resnet18_cwt_scratch,
-           resnet18_cwt, eegnet]
+  models: [eegnet_lr0.003_final, resnet18_cwt_lr0.0003_mps, resnet18_stft_lr0.0003_mps,
+           resnet18_cwt_mps, resnet18_stft_mps, resnet18_cwt_scratch, resnet18_cwt, eegnet]
 
 # --------------------------------------------------------------------------------------
 # Protocol. These values are fixed in src/. They are listed here for the report only.
@@ -129,7 +150,7 @@ protocol:
   eegnet: {F1: 8, D: 2, F2: 16, kernel_t: 125, kernel_sep: 32, dropout: 0.5,
            optimizer: AdamW, lr: 3.0e-3, weight_decay: 0.01, batch: 128,
            max_epochs: 80, patience: 8}   # final run; diagnostics use lr 1e-3, 40 epochs
-  resnet18: {weights: ImageNet, finetune: all layers, optimizer: AdamW, lr: 1.0e-4,
+  resnet18: {weights: ImageNet, finetune: all layers, optimizer: AdamW, lr: 3.0e-4,   # 1e-4 before 23 Nov
              weight_decay: 0.01, batch: 64, max_epochs: 80, patience: 8,
              amp: "cuda only (float32 on mps)"}
   early_stopping: "4 training subjects held out as internal validation"
