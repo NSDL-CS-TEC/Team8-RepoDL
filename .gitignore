@@ -43,3 +43,5 @@ report/**/*.toc
 
 # LaTeX sources of the reports are kept locally, not in the repo
 report/**/*.tex
+report/**/*.bib
+report/**/*.bbl
