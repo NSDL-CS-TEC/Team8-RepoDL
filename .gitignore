@@ -45,3 +45,7 @@ report/**/*.toc
 report/**/*.tex
 report/**/*.bib
 report/**/*.bbl
+
+# Inputs of the local LaTeX build: only the PDFs are versioned in report/
+report/01_reporte/generar_numeros.py
+report/01_reporte/figures/
