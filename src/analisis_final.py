@@ -294,13 +294,15 @@ def fig_por_sujeto(tab, a, b):
 
 # ------------------------- Programa principal -------------------------
 def main():
-    d = np.load(OUT_DIR / "ventanas.npz")
+    # Window metadata from the small CSV (same rows and order as ventanas.npz), so this
+    # step runs from a fresh clone without the dataset or the 146 MB windows file.
+    d = pd.read_csv(OUT_DIR / "ventanas_meta.csv")
     keep = np.load(OUT_DIR / "mascara_artefactos.npy")
-    y = d["y"][keep].astype(int)
-    subject = d["subject"][keep]
-    session = d["session"][keep]
-    trial = d["trial"][keep]
-    rt_ref = d["rt_ref"][keep]
+    y = d["y"].to_numpy()[keep].astype(int)
+    subject = d["subject"].to_numpy()[keep]
+    session = d["session"].to_numpy().astype(str)[keep]
+    trial = d["trial"].to_numpy()[keep]
+    rt_ref = d["rt_ref"].to_numpy()[keep]
     cond = np.array([(COND_RE.search(s).group(1) if COND_RE.search(s) else "?")
                      for s in session])
 

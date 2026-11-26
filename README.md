@@ -14,7 +14,7 @@ Course final project by Juan Pablo Acevedo Robles and Alberto Martinez Hernandez
 
 **Main runs.** The ResNet18 is `resnet18_cwt_lr0.0003_mps` and EEGNet is `eegnet_lr0.003_final`. Both ran on the same hardware and precision (Apple MPS, float32). The earlier ResNet18 at 1e-4 (`resnet18_cwt_mps`), Juan Pablo's CUDA runs (`resnet18_cwt`, and `resnet18_cwt_lr0.0003` in `results/respaldo_cuda_jp/`) and the initial EEGNet (`eegnet`, lr 1e-3, 40 epochs) are reported as sensitivity checks and replications; none supports the hypothesis. The pretraining ablation (`resnet18_cwt_scratch`) ran at 1e-4 and is paired with `resnet18_cwt_mps`.
 
-The report, slides and one-page summary (PDF and LaTeX source) are in `report/` (see `report/README.md`). The original protocol document (16 Nov) is archived in `report/archive/`; its numbers predate the final runs.
+The report, slides and one-page summary (PDF) are in `report/` (see `report/README.md`). The original protocol document (16 Nov) is archived in `report/archive/`; its numbers predate the final runs.
 
 ## Repository layout
 
@@ -60,7 +60,7 @@ Download the dataset from figshare (DOI [10.6084/m9.figshare.6427334.v2](https:/
 ```bash
 python train.py --list                # experiments defined in config.yaml
 python train.py prepare               # stages 1-4: inventory, windows, folds + baselines, images
-python train.py eegnet_final resnet18_cwt_mps   # main comparison (15 runs each: 5 folds x 3 seeds)
+python train.py eegnet_final resnet18_cwt_lr3e-4_mps   # main comparison (15 runs each: 5 folds x 3 seeds)
 python train.py all                   # main comparison + lr check + ablations + diagnostics
 python evaluate.py                    # summary table, lr selection, permutation + bootstrap
 python src/figuras_reporte.py         # English report figures and the main table
@@ -68,7 +68,8 @@ python src/figura_pipeline.py         # pipeline diagram
 ```
 
 - `python train.py <experiment> --quick` runs one fold for 3 epochs. Its outputs end in `_quick`, so the full results are not overwritten.
-- `--device cuda|mps|cpu` overrides `device` in `config.yaml`.
+- `--device cuda|mps|cpu` overrides `device` in `config.yaml`. The experiments ending in `_mps` set `device: mps` and fail on a machine without Apple Silicon; run them there with `--device cuda` (or `cpu`). Their outputs keep the `_mps` tag, so rename them or change `tag` in `config.yaml` to avoid confusing them with the reported runs.
+- `evaluate.py` and `src/figuras_reporte.py` run from a fresh clone, without the dataset: they only read the versioned files in `results/`. Only `fig_interpretacion` and `fig_representaciones` need `python train.py prepare` first, and are skipped otherwise.
 - Running `evaluate.py` on the current `results/` reproduces `permutacion.csv`, `comparacion_pareada.csv` and `analisis_por_sujeto.csv` exactly. All resampling uses fixed seeds.
 - The scripts in `src/` can also be run directly. They then need `EEG_DATA_DIR` set; the other `EEG_*` variables are documented at the top of each script.
 
@@ -98,7 +99,7 @@ The final set is **18,087 windows**: 13,094 fast and 4,993 slow (27.6% slow).
 | Model | Input | Parameters | Training |
 |---|---|---|---|
 | EEGNet v4 (F1=8, D=2, F2=16, kernel 125), from scratch | 1 × 3 × 750 | 2,265 | AdamW lr 3e-3, wd 0.01, batch 128, ≤80 epochs, patience 8, max-norm constraints |
-| ResNet18, ImageNet weights, all layers fine-tuned, 1-logit head | 3 × 128 × 128 | 11,177,025 | AdamW lr 1e-4, wd 0.01, batch 64, ≤80 epochs, patience 8, AMP on CUDA only |
+| ResNet18, ImageNet weights, all layers fine-tuned, 1-logit head | 3 × 128 × 128 | 11,177,025 | AdamW lr 3e-4 (1e-4 in the earlier runs), wd 0.01, batch 64, ≤80 epochs, patience 8, AMP on CUDA only |
 | Logistic regression on log band power (θ, α, β × 3 channels) | 9 features | 10 | scikit-learn, class-balanced |
 
 - **Objective.** Binary cross-entropy on the logit of the *slow* class, weighted by the class ratio of the training set.

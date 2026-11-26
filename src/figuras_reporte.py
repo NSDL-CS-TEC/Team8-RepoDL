@@ -152,10 +152,43 @@ def main():
     fig.tight_layout()
     save(fig, "fig_diagnostico")
 
+    # ---- Figure: per-subject failure analysis ----
+    ps = pd.read_csv(RES / "analisis_por_sujeto.csv").dropna(subset=[f"bal_acc_{MAIN_B}"])
+    fig, (b1, b2) = plt.subplots(1, 2, figsize=(9, 3.2))
+    for stem, lab, col in ((MAIN_B, "EEGNet", "#2b6cb0"), (MAIN_A, "ResNet18 CWT", "#c05621")):
+        b1.scatter(ps.pct_lenta, ps[f"bal_acc_{stem}"], s=18, color=col, label=lab, alpha=0.85)
+        b2.scatter(ps[f"tnr_{stem}"], ps[f"tpr_{stem}"], s=18, color=col, label=lab, alpha=0.85)
+    for _, r in ps.iterrows():
+        b1.annotate(str(int(r.subject)), (r.pct_lenta, r[f"bal_acc_{MAIN_B}"]), fontsize=6,
+                    xytext=(2, 2), textcoords="offset points", color="#52606d")
+    b1.axhline(0.5, color="#52606d", ls=":", lw=1)
+    b1.set_xlabel("proportion of slow windows in subject")
+    b1.set_ylabel("balanced accuracy")
+    b1.set_title("(a) Performance vs. subject base rate", fontsize=9)
+    b1.legend(fontsize=7, frameon=False)
+    b2.plot([0, 1], [1, 0], color="#9aa5b1", lw=0.8, ls="--")
+    b2.set_xlabel("true-negative rate (fast correct)")
+    b2.set_ylabel("true-positive rate (slow correct)")
+    b2.set_title("(b) Per-class rates per subject", fontsize=9)
+    b2.set_xlim(0.3, 1.02)
+    b2.set_ylim(0.3, 1.02)
+    fig.tight_layout()
+    save(fig, "fig_fallos")
+
+    # The last two figures read the regenerable windows and images (not versioned).
+    # Run `python train.py prepare` with the dataset in data/ to build them.
+    needed = [RES / f for f in ("ventanas.npz", "imagenes_cwt.npy", "imagenes_stft.npy",
+                                "saliencia_cwt.npz")]
+    missing = [f.name for f in needed if not f.exists()]
+    if missing:
+        print(f"Skipped fig_interpretacion and fig_representaciones (missing {', '.join(missing)}; "
+              "run `python train.py prepare`). Saved fig_resultados, fig_diagnostico, fig_fallos "
+              "and results/tabla_principal.csv")
+        return
+
     # ---- Figure: interpretation (class means per channel on all windows + Grad-CAM) ----
-    d = np.load(RES / "ventanas.npz")
     keep = np.load(RES / "mascara_artefactos.npy")
-    y = d["y"][keep].astype(bool)
+    y = pd.read_csv(RES / "ventanas_meta.csv")["y"].to_numpy()[keep].astype(bool)
     imgs = np.load(RES / "imagenes_cwt.npy", mmap_mode="r")
     acc = {0: np.zeros((3, 128, 128)), 1: np.zeros((3, 128, 128))}
     for i0 in range(0, len(y), 2000):
@@ -187,30 +220,8 @@ def main():
     fig.tight_layout()
     save(fig, "fig_interpretacion")
 
-    # ---- Figure: per-subject failure analysis ----
-    ps = pd.read_csv(RES / "analisis_por_sujeto.csv").dropna(subset=[f"bal_acc_{MAIN_B}"])
-    fig, (b1, b2) = plt.subplots(1, 2, figsize=(9, 3.2))
-    for stem, lab, col in ((MAIN_B, "EEGNet", "#2b6cb0"), (MAIN_A, "ResNet18 CWT", "#c05621")):
-        b1.scatter(ps.pct_lenta, ps[f"bal_acc_{stem}"], s=18, color=col, label=lab, alpha=0.85)
-        b2.scatter(ps[f"tnr_{stem}"], ps[f"tpr_{stem}"], s=18, color=col, label=lab, alpha=0.85)
-    for _, r in ps.iterrows():
-        b1.annotate(str(int(r.subject)), (r.pct_lenta, r[f"bal_acc_{MAIN_B}"]), fontsize=6,
-                    xytext=(2, 2), textcoords="offset points", color="#52606d")
-    b1.axhline(0.5, color="#52606d", ls=":", lw=1)
-    b1.set_xlabel("proportion of slow windows in subject")
-    b1.set_ylabel("balanced accuracy")
-    b1.set_title("(a) Performance vs. subject base rate", fontsize=9)
-    b1.legend(fontsize=7, frameon=False)
-    b2.plot([0, 1], [1, 0], color="#9aa5b1", lw=0.8, ls="--")
-    b2.set_xlabel("true-negative rate (fast correct)")
-    b2.set_ylabel("true-positive rate (slow correct)")
-    b2.set_title("(b) Per-class rates per subject", fontsize=9)
-    b2.set_xlim(0.3, 1.02)
-    b2.set_ylim(0.3, 1.02)
-    fig.tight_layout()
-    save(fig, "fig_fallos")
-
     # ---- Figure: the three representations of one slow and one fast window ----
+    d = np.load(RES / "ventanas.npz")
     X = d["X"][keep]
     stft = np.load(RES / "imagenes_stft.npy", mmap_mode="r")
     sess = d["session"][keep]

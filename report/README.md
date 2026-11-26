@@ -2,15 +2,15 @@
 
 | Path | Content |
 |---|---|
-| `01_reporte/main.pdf` | Final report (IEEE conference template, English). Source: `main.tex`, `refs.bib`, `figures/`. |
-| `02_presentacion/slides.pdf` | 10-minute presentation (Beamer, 16:9). Source: `slides.tex`. |
-| `03_resumen/resumen.pdf` | One-page summary. Source: `resumen.tex`. |
+| `01_reporte/main.pdf` | Final report (IEEE conference template, English). |
+| `02_presentacion/slides.pdf` | 10-minute presentation (Beamer, 16:9). |
+| `03_resumen/resumen.pdf` | One-page summary. |
 | `contexto_tesis_Alberto.md` | Alberto's thesis context and next step (Spanish and English). |
 | `archive/protocol_2026-11-16.docx` | Protocol and status document as of 16 Nov 2026, kept as history. Its numbers predate the final runs; the PDFs above are the reference. |
 
-No number in the documents is typed by hand. They come from `results/` through `01_reporte/numeros.tex` and the `tabla_*.tex` tables, which `generar_numeros.py` writes. The slides and summary reuse the report's macros and figures (`../01_reporte/`).
+The LaTeX sources (`*.tex`, `refs.bib`) are not versioned; the authors keep them locally. No number in the documents is typed by hand: `01_reporte/generar_numeros.py` writes them from `results/` into `numeros.tex` and the `tabla_*.tex` tables, which the sources include.
 
-To regenerate after any change in the results:
+With the sources in place, regenerate after any change in the results:
 
 ```bash
 python evaluate.py
