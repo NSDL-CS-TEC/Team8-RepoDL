@@ -44,6 +44,7 @@ report/**/*.toc
 # LaTeX sources of the reports are kept locally, not in the repo
 report/**/*.tex
 report/**/*.bib
+!report/01_reporte/refs.bib
 report/**/*.bbl
 
 # Inputs of the local LaTeX build: only the PDFs are versioned in report/
